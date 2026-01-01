@@ -1,12 +1,27 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-
 import BalanceCardSection from '@/src/components/section/BalanceCardSection';
 import MonthlyReportSection from '@/src/components/section/MonthlyReportSection';
 import WalletSection from '@/src/components/section/WalletSection';
 import AddTransactionButton from '@/src/components/ui/addTransactionButton';
+import { useTransactionStore } from '@/src/store/transaction.store';
+import { useEffect } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
+
+  const { transactions, fetchTransactions } = useTransactionStore();
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const income = transactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const expense = transactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + t.amount, 0);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -45,19 +60,5 @@ const styles = StyleSheet.create({
   },
   headerItem: {
     color: 'white',
-  },
-  fab: {
-    position: 'absolute',
-    right: 24,
-    bottom: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#F5C542',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  fabText: {
-    fontSize: 28,
   },
 });

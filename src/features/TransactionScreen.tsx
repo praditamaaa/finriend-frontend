@@ -1,59 +1,31 @@
 import AddTransactionButton from '@/src/components/ui/addTransactionButton';
-import { useState } from 'react';
+import { useTransactionStore } from '@/src/store/transaction.store';
+import { useEffect, useState } from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TransactionScreen() {
   const [search, setSearch] = useState('');
+  const {
+    transactions,
+    loading,
+    fetchTransactions,
+  } = useTransactionStore();
 
-  const transactions = [
-    {
-      title: 'Makan Baso',
-      amount: -15000,
-      date: '24 Oktober 2025',
-    },
-    {
-      title: 'Top up ML',
-      amount: -150000,
-      date: '24 Oktober 2025',
-    },
-    {
-      title: 'Projek cair',
-      amount: 20000000,
-      date: '21 Oktober 2025',
-    },
-    {
-      title: 'Transfer ortu',
-      amount: 500000,
-      date: '15 Oktober 2025',
-    },
-    {
-      title: 'Makan Baso',
-      amount: -15000,
-      date: '24 Oktober 2025',
-    },
-    {
-      title: 'Top up ML',
-      amount: -150000,
-      date: '24 Oktober 2025',
-    },
-    {
-      title: 'Projek cair',
-      amount: 20000000,
-      date: '21 Oktober 2025',
-    },
-    {
-      title: 'Transfer ortu',
-      amount: 500000,
-      date: '15 Oktober 2025',
-    },
-  ];
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const filteredTransactions = transactions.filter((item) =>
+    item.title.toLowerCase().includes(search.toLowerCase())
+  );
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,13 +66,15 @@ export default function TransactionScreen() {
 function TransactionItem({
   title,
   amount,
+  type,
   date,
 }: {
   title: string;
   amount: number;
+  type: 'income' | 'expense';
   date: string;
 }) {
-  const isIncome = amount > 0;
+  const isIncome = type == 'income';
 
   return (
     <View style={styles.item}>

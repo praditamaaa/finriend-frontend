@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+// import { FontProvider } from '@/src/providers/FontProviders';
 
 export default function RootLayout() {
   return (
@@ -16,7 +17,7 @@ export default function RootLayout() {
         style="dark"
         backgroundColor="#386550"
         translucent={false} 
-      />
+        />
     </>
   );
 }

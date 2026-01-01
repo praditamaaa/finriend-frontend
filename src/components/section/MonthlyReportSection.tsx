@@ -1,13 +1,39 @@
 import Button from '@/src/components/ui/Button';
-import { useState } from 'react';
+import { useTransactionStore } from '@/src/store/transaction.store';
+import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { BarChart } from 'react-native-gifted-charts';
 
 type ReportType = 'income' | 'expense';
 
 export default function MonthlyReportSection() {
   const [active, setActive] = useState<ReportType>('income');
 
+  const transactions = useTransactionStore(
+    (state) => state.transactions
+  );
+
   const isIncome = active === 'income';
+
+  const chartData = useMemo(() => {
+    const filtered = transactions.filter(
+      (t) => t.type === active
+    );
+
+    const grouped = filtered.reduce<Record<string, number>>(
+      (acc, t) => {
+        acc[t.category] = (acc[t.category] || 0) + t.amount;
+        return acc;
+      },
+      {}
+  );
+
+  return Object.entries(grouped).map(([label, value]) => ({
+      label,
+      value,
+      frontColor: isIncome ? '#4C8C2B' : '#FF4D4F',
+    }));
+  }, [transactions, active]);
 
   return (
     <View style={styles.container}>
@@ -36,7 +62,25 @@ export default function MonthlyReportSection() {
       </View>
 
       {/* Chart Placeholder */}
-      <View style={styles.chartPlaceholder} />
+        {chartData.length === 0 ? (
+        <view>
+          <Text>
+            Belum ada data
+          </Text>
+        </view>
+      ) : (
+        <BarChart
+          data={chartData}
+          barWidth={32}
+          spacing={24}
+          roundedTop
+          hideRules
+          yAxisThickness={0}
+          xAxisThickness={0}
+          noOfSections={4}
+          isAnimated
+        />
+      )}
     </View>
   );
 }
@@ -59,5 +103,11 @@ const styles = StyleSheet.create({
     height: 400,
     borderRadius: 12,
     backgroundColor: '#F2F2F2',
+  },
+
+  emptyText: {
+    textAlign: 'center',
+    color: '#999',
+    paddingVertical: 40,
   },
 });
